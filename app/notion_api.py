@@ -2,10 +2,9 @@ import requests
 import os
 from dotenv import load_dotenv
 
-# Load API key and root page ID
 load_dotenv()
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
-ROOT_PAGE_ID = os.getenv("NOTION_PAGE_ID")  # Start from a known page
+ROOT_PAGE_ID = os.getenv("NOTION_PAGE_ID")  
 
 HEADERS = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
@@ -15,7 +14,7 @@ HEADERS = {
 
 """Fetch all child blocks (paragraphs, sub-pages, etc.) from a Notion page"""
 def fetch_page_blocks(page_id: str) -> dict:
-    url = f"https://api.notion.com/v1/blocks/{page_id}/children"
+    url = f"https://api.notion.com/v1/pages/{page_id}/"
     response = requests.get(url, headers=HEADERS)
 
     if response.status_code != 200:
@@ -58,4 +57,14 @@ def fetch_all_pages(root_page_id: str) -> list:
     dfs(root_page_id)
     return list(visited)
 
+if __name__ == "__main__":
+    print("🔍 Testing Notion API connection...")
+
+    if not NOTION_API_KEY:
+        print("ERROR: NOTION_API_KEY is missing! Check your .env file.")
+    elif not ROOT_PAGE_ID:
+        print("ERROR: NOTION_PAGE_ID is missing! Check your .env file.")
+    else:
+        response = fetch_page_blocks(ROOT_PAGE_ID)
+        print("API Response:", response)
 
