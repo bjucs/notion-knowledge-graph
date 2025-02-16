@@ -7,3 +7,6 @@ Setting up development environment for `notion-knowledge-graph`:
 Installing new dependencies: 
 - Use `pip install <dependency-name>` once within the venv to install any new dependencies, followed by `pip freeze > requirements.txt` to pipe all new dependencies to the `requirements.txt` dependencies list 
 - This acts as similar to a `package-lock.json`, allowing collaborators to install exact dependencies with the correct versions.
+
+Issues: 
+- Currently, fetch_all_pages is grossly inefficient AND it only returns the home page and not any of the child pages. 
