@@ -43,37 +43,37 @@ def fetch_database_pages(database_id: str) -> list:
 def extract_page_links(blocks_data):
     linked_pages = set()  
 
-    print("\n📌 DEBUG: Checking blocks...")
+    print("\nDEBUG: Checking blocks...")
     for block in blocks_data.get("results", []):
         block_id = block["id"]
         block_type = block["type"]
-        print(f"➡️ Block: {block_id}, Type: {block_type}")
+        print(f"Block: {block_id}, Type: {block_type}")
 
         if block_type == "child_page":
             linked_pages.add(block_id)
-            print(f"✅ Found child_page: {block_id}")
+            print(f"Found child_page: {block_id}")
 
         elif block_type == "link_to_page":
             linked_page_id = block.get("link_to_page", {}).get("page_id")
             if linked_page_id:
                 linked_pages.add(linked_page_id)
-                print(f"✅ Found link_to_page: {linked_page_id}")
+                print(f"Found link_to_page: {linked_page_id}")
 
         elif block_type == "column_list":
             columns = fetch_page_blocks(block_id)
             for column in columns.get("results", []):
                 if column["type"] == "column" and column["has_children"]:
-                    print(f"🔍 Found column, fetching child blocks...")
+                    print(f"Found column, fetching child blocks...")
                     column_blocks = fetch_page_blocks(column["id"])
                     linked_pages.update(extract_page_links(column_blocks))
 
         elif block_type == "child_database":
-            print(f"📂 Found child_database: {block_id}, fetching pages inside...")
+            print(f"Found child_database: {block_id}, fetching pages inside...")
             db_pages = fetch_database_pages(block_id)
             linked_pages.update(db_pages)
 
         elif block["has_children"]:
-            print(f"🔄 Fetching child blocks inside {block_type}...")
+            print(f"Fetching child blocks inside {block_type}...")
             child_blocks = fetch_page_blocks(block_id)
             linked_pages.update(extract_page_links(child_blocks))
 
@@ -104,7 +104,7 @@ def fetch_all_pages(root_page_id: str) -> list:
     return list(visited)
 
 if __name__ == "__main__":
-    print("🔍 Testing Notion API connection...")
+    print("Testing Notion API connection...")
 
     if not NOTION_API_KEY:
         print("ERROR: NOTION_API_KEY is missing! Check your .env file.")
