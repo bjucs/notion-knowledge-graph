@@ -23,6 +23,11 @@ def fetch_page_blocks(page_id: str) -> dict:
 
     if response.status_code != 200:
         return {"error": f"Failed to fetch page {page_id}. Status: {response.status_code}"}
+    
+    # data = response.json()
+    # print(f"\nDEBUG: Blocks in {page_id}")
+    # for block in data.get("results", []):
+    #     print(f"Block ID: {block['id']}, Type: {block['type']}")
 
     return response.json()
 
@@ -71,6 +76,16 @@ def extract_page_links(blocks_data):
             print(f"Found child_database: {block_id}, fetching pages inside...")
             db_pages = fetch_database_pages(block_id)
             linked_pages.update(db_pages)
+
+        elif block_type in ["paragraph", "heading_1", "heading_2", "heading_3"]:
+            rich_text = block.get(block_type, {}).get("rich_text", [])
+            for text_item in rich_text:
+                href = text_item.get("href")  # Notion links are stored here
+                if href and "notion.so" in href:
+                    notion_page_id = href.split("/")[-1].split("?")[0]  
+                    linked_pages.add(notion_page_id)
+                    print(f"Found embedded Notion link in text: {notion_page_id}")
+
 
         elif block["has_children"]:
             print(f"Fetching child blocks inside {block_type}...")
