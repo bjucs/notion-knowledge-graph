@@ -3,7 +3,12 @@ notion-text-search is an API developed using FastAPI & Python to do a keyword se
 
 (e.g. `i like trains` -> will match to block `i sometimes might like trains`, since the consecutive sequence of strings `like trains` is matched)
 
+## Usage
+You will need a `.env` file to hold environment variables for the `notion_search()` API call. Specifically, you need the `NOTION_API_KEY` from your Notion Developer Integration, as well as `NOTION_PAGE_ID` (the root page you want your Notion to access adjacencies/linked pages from). 
 
+Essentially, you give the `notion_search` function a page_id of a root page in your personal notion that has links to other pages in your personal Notion. The API call will then return the block IDs of all Notion Blocks with a full or partial match to the inputted string for `notion_search`. 
+
+Note: your Notion Developer Integration *must* have access to each linked page from the root page.
 
 ## Development setup 
 Setting up development environment for `notion-knowledge-graph`:
