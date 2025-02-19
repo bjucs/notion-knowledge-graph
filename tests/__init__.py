@@ -1,11 +1,9 @@
 # tests/__init__.py
 
 """
-This package contains unit tests for the Notion Knowledge Graph.
+This package contains unit tests for Notion Text Search.
 It includes:
 - test_notion_api.py (Tests Notion API interactions)
-- test_graph_db.py (Tests Neo4j database interactions)
-- test_routes.py (Tests FastAPI endpoints)
 """
 
 from dotenv import load_dotenv
