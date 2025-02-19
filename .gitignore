@@ -2,3 +2,5 @@ venv/
 .env
 __pycache__/
 notion_api.log
+TODO.md
+.vscode/

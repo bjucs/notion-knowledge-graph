@@ -1,8 +1,11 @@
+from fastapi import FastAPI
 import requests
 import os
 import sys
 import re
 from dotenv import load_dotenv
+
+app = FastAPI()
 
 load_dotenv()
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
@@ -17,7 +20,7 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-"""Fetch all child blocks (paragraphs, sub-pages, etc.) from a Notion page"""
+""" Fetch all child blocks (paragraphs, sub-pages, etc.) from a Notion page """
 def fetch_page_blocks(page_id: str) -> dict:
     url = f"https://api.notion.com/v1/blocks/{page_id}/children/"
     response = requests.get(url, headers=HEADERS)
@@ -84,7 +87,8 @@ def extract_page_links(blocks_data: dict) -> set:
 
     return list(linked_pages) 
 
-"""Recursively finds all pages linked from the root page, avoiding duplicate API calls"""
+"""Recursively finds all pages linked from the root page, 
+avoiding duplicate API calls"""
 def fetch_all_pages(root_page_id: str) -> list:
     visited = set()
     cache = {}
@@ -108,9 +112,10 @@ def fetch_all_pages(root_page_id: str) -> list:
     dfs(root_page_id)
     return list(visited)
 
+""" Search for all occurrences of search_str across all pages 
+reachable from root_page_id. """
+@app.get("/notion_search/{search_str}/{root_page_id}")
 def notion_search(search_str: str, root_page_id: str) -> dict:
-    """Search for occurrences of search_str across all pages linked from root_page_id."""
-    
     matched_blocks = {}  
 
     all_pages = fetch_all_pages(root_page_id)
@@ -133,15 +138,16 @@ def notion_search(search_str: str, root_page_id: str) -> dict:
 
     return matched_blocks 
 
+"""Check if search_str appears as a whole or partial phrase in text."""
 def is_match(text: str, search_str: str) -> bool:
-    """Check if search_str appears as a whole or partial phrase in text."""
     search_str = search_str.lower()
     text = text.lower()
 
     if search_str in text:
         return True
 
-    # Multi-word phrase match (e.g., "important project" appears as sequence)
+    """ Multi-word phrase match (e.g., `like ducks` is matched as a sequence of 
+    `I like ducks on Sundays` """
     search_pattern = re.compile(r"\b" + re.escape(search_str) + r"\b", re.IGNORECASE)
     return bool(search_pattern.search(text))
 
@@ -154,7 +160,7 @@ if __name__ == "__main__":
         print("ERROR: NOTION_PAGE_ID is missing! Check your .env file.")
     else:
         search_results = notion_search("Significant Impact", ROOT_PAGE_ID)
-        print("🔎 Search Results:", search_results)
+        print("Search Results:", search_results)
     
     sys.stdout = sys.__stdout__
     log_file.close()
